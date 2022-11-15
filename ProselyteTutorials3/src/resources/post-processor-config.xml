@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+    http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util.xsd
+">
+    <import resource="test/messagetest.xml"/>
+
+    <util:set id="set" set-class="java.util.HashSet">
+        <bean class="net.proselyte.beanpostprocessor.Message">
+            <property name="message" value="jhjhjhklj"/>
+            <property name="test">
+                <value>11111</value>
+            </property>
+        </bean>
+    </util:set>
+
+    <util:map id="map" map-class="java.util.HashMap">
+        <entry key="1" value-ref="message"/>
+    </util:map>
+
+    <bean id="dateFormat" class="java.text.SimpleDateFormat">
+        <constructor-arg value="yyy-MM-dd"/>
+    </bean>
+
+    <bean id="test" class="net.proselyte.beanpostprocessor.Test" init-method="init" destroy-method="destroy">
+        <property name="messageSet">
+            <ref bean="set"/>
+        </property>
+        <property name="messageMap">
+            <ref bean="map"/>
+        </property>
+        <property name="date">
+            <bean factory-bean="dateFormat" factory-method="parse">
+                <constructor-arg value="2022-15-11"/>
+            </bean>
+        </property>
+    </bean>
+
+    <util:properties id="massagesValue" location="classpath:messages.properties"/>
+    <util:properties id="databaseValue" location="database.properties"/>
+
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="url" value="${test.url}"/>
+        <property name="username" value="${test.user}"/>
+        <property name="password" value="${test.password}"/>
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+    </bean>
+
+    <bean id="dao" class="net.proselyte.beanpostprocessor.DAO">
+        <property name="driverManagerDataSource">
+            <idref bean="dataSource"/>
+        </property>
+    </bean>
+
+</beans>
